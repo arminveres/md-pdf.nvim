@@ -2,13 +2,17 @@ local uv = vim.loop
 
 local M = {}
 
-function M.setup()
-  vim.keymap.set("n", "<Space>,", M.convert_md_to_pdf)
+function M.setup(config)
+  if config == nil then
+    vim.keymap.set("n", "<Space>,", M.convert_md_to_pdf)
+  else
+    config()
+  end
 end
 
 function M.convert_md_to_pdf()
   --- Absolute path of current file
-  local filepath = "./" .. vim.fn.expand("%:p")
+  local filepath = vim.fn.expand("%:p")
   local stdin = uv.new_pipe()
   local stdout = uv.new_pipe()
   local stderr = uv.new_pipe()
@@ -20,12 +24,12 @@ function M.convert_md_to_pdf()
     function(code, signal) -- on exit
       stdout:close()
       stderr:close()
-      -- handle:close()
+      -- output_handle:close()
       print("exit code", code)
       print("exit signal", signal)
     end)
 
-  print("process opened", handle)
+  print("process opened", output_handle)
 
 
   uv.read_start(stdout, function(err, data)

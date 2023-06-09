@@ -9,7 +9,13 @@ Currently you can just put it into `lazy` or `packer` and require it at some poi
 ```lua
 'arminveres/md-pdf'
 ---
-require('md-pdf').setup()
+require('md-pdf').setup() -- default mapping
+require('md-pdf').setup(
+  function()
+    local mdfpdf = require('md-pdf')
+    vim.keymap.set("n", "<Space>,", mdpdf.convert_md_to_pdf)
+  end
+) -- default mapping
 ```
 
 ## Usage
