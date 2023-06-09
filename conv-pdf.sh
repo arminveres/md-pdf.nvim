@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -e
 
 case "$(uname -s)" in
@@ -9,8 +10,8 @@ Darwin*)
 	PDF_VIEWER=open
 	;;
 CYGWIN*) ;;
-MINGW*) ;;
-MSYS_NT*) ;;
+MINGW*) PDF_VIEWER="powershell.exe";;
+MSYS_NT*) PDF_VIEWER='' ;;
 *) ;;
 esac
 

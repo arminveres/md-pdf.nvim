@@ -9,7 +9,7 @@ Currently you can just put it into `lazy` or `packer` and require it at some poi
 ```lua
 'arminveres/md-pdf'
 ---
-require('md-pdf)
+require('md-pdf').setup()
 ```
 
 ## Usage
@@ -20,12 +20,14 @@ Default mapping, `<leader>,`, opens a view.
 
 Currently only tested on Linux (Fedora Workstation 38)
 
-- PDF Viewer, uses `xdg-open`
-- `pandoc` for conversion
+- PDF Viewer, uses `xdg-open` on Linux, `open` on Mac and `powershell` on Windows
+- [`pandoc`](https://pandoc.org/installing.html) for conversion, also probably some TeX distribution
+  with `pdflatex` included.
 
 ## TODO
 
+- [ ] Migrate fully to lua
 - [ ] Don't open new window if one is already open
 - [ ] Add configuration setup
 - Platform support
-  - [ ] Windows
+  - [ ] Windows, see #1
