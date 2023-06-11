@@ -7,7 +7,10 @@ A very simple and easy plugin to convert open markdown files to PDFs and open th
 Currently you can just put it into `lazy` or `packer` and require it at some point.
 
 ```lua
-'arminveres/md-pdf'
+{
+  'arminveres/md-pdf',
+  branch = 'main' -- you can assume that main is somewhat stable until releases will be made
+}
 ---
 require('md-pdf').setup() -- default mapping
 require('md-pdf').setup(
