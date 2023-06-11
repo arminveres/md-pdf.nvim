@@ -13,24 +13,26 @@ end
 function M.convert_md_to_pdf()
   --- Absolute path of current file
   local filepath = vim.fn.expand("%:p")
-  local stdin = uv.new_pipe()
+  local convpath = debug.getinfo(1, "S").source:sub(2):match("(.*/)"):sub(1, -5) .. "conv-pdf.sh"
+  -- local stdin = uv.new_pipe()
   local stdout = uv.new_pipe()
   local stderr = uv.new_pipe()
-  local output_handle = uv.spawn("./conv-pdf.sh",
+  handle = uv.spawn(convpath,
     {
       args = { filepath },
-      stdio = { stdin, stdout, stderr },
+      stdio = { nil, stdout, stderr },
     },
     function(code, signal) -- on exit
+      stdout:read_stop()
+      stderr:read_stop()
       stdout:close()
       stderr:close()
-      -- output_handle:close()
-      print("exit code", code)
-      print("exit signal", signal)
+      handle:close()
+      -- print("exit code", code)
+      -- print("exit signal", signal)
     end)
 
-  print("process opened", output_handle)
-
+  print("process opened", handle)
 
   uv.read_start(stdout, function(err, data)
     assert(not err, err)
