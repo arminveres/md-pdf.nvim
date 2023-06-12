@@ -13,6 +13,7 @@ local default_config = {
     --- Generate a table of contents, on by default
     toc = true,
 }
+local viewer_open = false
 
 function M.setup(config)
     for index, entry in pairs(config) do
@@ -55,18 +56,17 @@ function M.convert_md_to_pdf()
     end
 
     local function open_doc()
-        handle = uv.spawn("zathura", {
+        if viewer_open then
+            return
+        else
+            viewer_open = true
+        end
+        zathura_handle = uv.spawn("zathura", {
             args = { string.sub(fullname, 1, -3) .. "pdf" },
         }, function(code, signal) -- on exit
-            -- stdout:read_stop()
-            -- stderr:read_stop()
-            -- stdout:close()
-            -- stderr:close()
-            handle:close()
-            -- print_out()
-            -- print('DOCUMENT CONVERSION COMPLETE')
-            -- print("exit code", code)
-            -- print("exit signal", signal)
+            viewer_open = false
+            zathura_handle:close()
+            print('Document viewer closed!')
         end)
     end
 
@@ -80,9 +80,11 @@ function M.convert_md_to_pdf()
         default_config.highlight,
     }
 
-    if default_config.toc then table.insert(pandoc_args, "--toc") end
+    if default_config.toc then
+        table.insert(pandoc_args, "--toc")
+    end
 
-    handle = uv.spawn("pandoc", {
+    pandoc_handle = uv.spawn("pandoc", {
         args = pandoc_args,
         stdio = { nil, stdout, stderr },
     }, function(code, signal) -- on exit
@@ -90,35 +92,16 @@ function M.convert_md_to_pdf()
         stderr:read_stop()
         stdout:close()
         stderr:close()
-        handle:close()
+        pandoc_handle:close()
         print_out()
         open_doc()
         print("DOCUMENT CONVERSION COMPLETE")
     end)
 
-    print("process opened", handle)
+    print("process opened", pandoc_handle)
 
     uv.read_start(stdout, onread)
     uv.read_start(stderr, onread)
 end
-
--- function M.open_doc()
---   local fullname = vim.api.nvim_buf_get_name(0)
---   handle = uv.spawn('zathura',
---     {
---       args = { fullname.sub(1, -2) .. 'pdf' },
---     },
---     function(code, signal) -- on exit
---       -- stdout:read_stop()
---       -- stderr:read_stop()
---       -- stdout:close()
---       -- stderr:close()
---       handle:close()
---       -- print_out()
---       -- print('DOCUMENT CONVERSION COMPLETE')
---       -- print("exit code", code)
---       -- print("exit signal", signal)
---     end)
--- end
 
 return M
