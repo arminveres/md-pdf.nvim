@@ -11,19 +11,26 @@ Currently you can just put it into `lazy` or `packer` and require it at some poi
   'arminveres/md-pdf',
   branch = 'main' -- you can assume that main is somewhat stable until releases will be made
 }
----
-require('md-pdf').setup() -- default mapping
-require('md-pdf').setup(
-  function()
-    local mdfpdf = require('md-pdf')
-    vim.keymap.set("n", "<Space>,", mdpdf.convert_md_to_pdf)
-  end
-) -- default mapping
 ```
 
 ## Usage
 
-Default mapping, `<leader>,`, opens a view.
+```lua
+require('md-pdf').setup() -- default options, or
+require('md-pdf').setup({
+  --- Set margins around document
+  margins = "1cm",
+  --- tango, pygments are quite nice for white on white
+  highlight = "tango",
+  --- Generate a table of contents, on by default
+  toc = true,
+})
+
+-- setup mapping
+vim.keymap.set("n", "<Space>,", function()
+    require('md-pdf').convert_md_to_pdf()
+end)
+```
 
 ## Requirements
 
@@ -37,6 +44,6 @@ Currently only tested on Linux (Fedora Workstation 38)
 
 - [ ] Migrate fully to lua
 - [ ] Don't open new window if one is already open
-- [ ] Add configuration setup
+- [x] Add configuration setup
 - Platform support
   - [ ] Windows, see #1
