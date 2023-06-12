@@ -27,6 +27,10 @@ function M.setup(config)
 end
 
 function M.convert_md_to_pdf()
+    if vim.bo.filetype ~= "markdown" then
+        utils.log_error("Incorrect filetype " .. vim.bo.filetype .. " not supported!")
+        return
+    end
     --- name of current file
     local shortname = vim.fn.expand("%:t:r")
     --- Absolute path of current file
@@ -53,7 +57,7 @@ function M.convert_md_to_pdf()
     local function print_out()
         local count = #results
         for i = 0, count do
-            print(results[i])
+            utils.log_info(results[i])
             results[i] = nil -- clear the table for next search
         end
     end
@@ -69,7 +73,7 @@ function M.convert_md_to_pdf()
         }, function(code, signal) -- on exit
             viewer_open = false
             zathura_handle:close()
-            print("Document viewer closed!")
+            utils.log_info("Document viewer closed!")
         end)
     end
 
@@ -98,10 +102,10 @@ function M.convert_md_to_pdf()
         pandoc_handle:close()
         print_out()
         open_doc()
-        print("DOCUMENT CONVERSION COMPLETE")
+        utils.log_info("DOCUMENT CONVERSION COMPLETE")
     end)
 
-    print("process opened", pandoc_handle)
+    utils.log_info("process opened " .. tostring(pandoc_handle))
 
     uv.read_start(stdout, onread)
     uv.read_start(stderr, onread)

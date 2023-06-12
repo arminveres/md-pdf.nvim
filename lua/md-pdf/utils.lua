@@ -10,4 +10,12 @@ function M.has_value(tab, val)
     return false
 end
 
+function M.log_error(str)
+    vim.notify(str, vim.log.levels.ERROR)
+end
+function M.log_info(str)
+    vim.notify(str)
+end
+
+
 return M
