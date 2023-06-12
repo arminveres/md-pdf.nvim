@@ -2,6 +2,9 @@
 
 A very simple and easy plugin to convert open markdown files to PDFs and open them it to the side.
 
+![image](https://github.com/arminveres/md-pdf.nvim/assets/45210978/0c9cefb4-43b0-4cb5-8cb6-4b74802d7838)
+
+
 ## Installation
 
 Currently you can just put it into `lazy` or `packer` and require it at some point.
