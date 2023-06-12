@@ -16,6 +16,9 @@ local default_config = {
 local viewer_open = false
 
 function M.setup(config)
+    if config == nil then
+        return
+    end
     for index, entry in pairs(config) do
         if utils.has_value(config, index) then
             default_config[index] = entry
@@ -66,7 +69,7 @@ function M.convert_md_to_pdf()
         }, function(code, signal) -- on exit
             viewer_open = false
             zathura_handle:close()
-            print('Document viewer closed!')
+            print("Document viewer closed!")
         end)
     end
 
