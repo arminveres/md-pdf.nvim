@@ -14,6 +14,13 @@ local default_config = {
     toc = true,
 }
 local viewer_open = false
+local function get_preview_command()
+    local os_used = uv.os_uname().sysname
+    if os_used == 'Linux' then return 'xdg-open' end
+    if os_used == 'Darwin' then return 'open' end
+    if os_used == 'MINGW' then return 'powershell.exe' end
+end
+
 
 function M.setup(config)
     if config == nil then
@@ -70,7 +77,7 @@ function M.convert_md_to_pdf()
         else
             viewer_open = true
         end
-        zathura_handle = uv.spawn("xdg-open", {
+        zathura_handle = uv.spawn(get_preview_command(), {
             args = { pdf_output_path },
         }, function(code, signal) -- on exit
             viewer_open = false
