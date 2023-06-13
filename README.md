@@ -53,14 +53,8 @@ Currently only tested on Linux (Fedora Workstation 38)
 - [`pandoc`](https://pandoc.org/installing.html) for conversion, also probably some TeX distribution
   with `pdflatex` included.
 
-## Caveats
-
-> **Warning**: If you are using a Project rooter like `project.nvim` then the output destination may not
-> correlate with the right path. The output will always be the project root.
-
 ## TODO
 
 - [ ] Don't open new window if one is already open
 - Platform support
   - [ ] Windows, see #1
-- [ ] Add support for project rooters

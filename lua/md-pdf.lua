@@ -35,6 +35,8 @@ function M.convert_md_to_pdf()
     local shortname = vim.fn.expand("%:t:r")
     --- Absolute path of current file
     local fullname = vim.api.nvim_buf_get_name(0)
+    --- pdf path name
+    local pdf_output_path = string.sub(fullname, 1, -3) .. "pdf"
     -- local stdin = uv.new_pipe()
     local stdout = uv.new_pipe()
     local stderr = uv.new_pipe()
@@ -42,7 +44,7 @@ function M.convert_md_to_pdf()
     local function onread(err, data)
         if err then
             -- TODO handle err
-            print("ERROR: ", err)
+            utils.log_error("ERROR: " .. tostring(err))
         end
         if data then
             local vals = vim.split(data, "\n")
@@ -69,7 +71,7 @@ function M.convert_md_to_pdf()
             viewer_open = true
         end
         zathura_handle = uv.spawn("zathura", {
-            args = { string.sub(fullname, 1, -3) .. "pdf" },
+            args = { pdf_output_path },
         }, function(code, signal) -- on exit
             viewer_open = false
             zathura_handle:close()
@@ -82,7 +84,7 @@ function M.convert_md_to_pdf()
         "geometry:margin=" .. default_config.margins,
         fullname,
         "-o",
-        string.format("%s.pdf", shortname),
+        pdf_output_path,
         "--highlight",
         default_config.highlight,
     }
