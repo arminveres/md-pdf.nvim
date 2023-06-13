@@ -70,7 +70,7 @@ function M.convert_md_to_pdf()
         else
             viewer_open = true
         end
-        zathura_handle = uv.spawn("zathura", {
+        zathura_handle = uv.spawn("xdg-open", {
             args = { pdf_output_path },
         }, function(code, signal) -- on exit
             viewer_open = false

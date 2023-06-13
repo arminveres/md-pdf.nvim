@@ -58,3 +58,4 @@ Currently only tested on Linux (Fedora Workstation 38)
 - [ ] Don't open new window if one is already open
 - Platform support
   - [ ] Windows, see #1
+  - [ ] MacOS
