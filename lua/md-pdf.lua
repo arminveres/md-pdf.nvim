@@ -13,11 +13,14 @@ local default_config = {
     --- Generate a table of contents, on by default
     toc = true,
 }
+
 local viewer_open = false
+
 local function get_preview_command()
     local os_used = uv.os_uname().sysname
     if os_used == 'Linux' then return 'xdg-open' end
     if os_used == 'Darwin' then return 'open' end
+    -- assume the other OS is windows for now
     return 'powershell.exe'
 end
 
@@ -120,8 +123,10 @@ function M.convert_md_to_pdf()
     uv.read_start(stderr, onread)
 end
 
+local mdaugroup = vim.api.nvim_create_augroup("md-pdf", { clear = true })
+
 vim.api.nvim_create_autocmd("BufWritePost", {
-    group = vim.api.nvim_create_augroup("md-pdf", { clear = true }),
+    group = mdaugroup,
     pattern = "*.md",
     callback = function()
         if not viewer_open then return end

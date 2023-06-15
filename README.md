@@ -7,6 +7,13 @@ A very simple and easy plugin to convert open markdown files to PDFs and open th
 
 ![image](https://github.com/arminveres/md-pdf.nvim/assets/45210978/0c9cefb4-43b0-4cb5-8cb6-4b74802d7838)
 
+## Features
+
+- Preview markdown documents easily on Linux, Mac and Windows
+- Generate PDF out of markdown
+- Lightweight ~200 loc fully lua written plugin
+- auto-generate on save, don't reopen new viewer
+
 ## Installation
 
 Currently you can just put it into `lazy` or `packer` and require it at some point.
@@ -21,7 +28,9 @@ Currently you can just put it into `lazy` or `packer` and require it at some poi
     keys = { { '<leader>,' } },
     config = function()
         require('md-pdf').setup() -- default options, or see down below for further options
-        vim.keymap.set("n", "<leader>,", require('md-pdf').convert_md_to_pdf, { desc = "Markdown preview" })
+        vim.keymap.set("n", "<leader>,", require('md-pdf').convert_md_to_pdf,
+            { desc = "Markdown preview" }
+        )
     end
 }
 ```
@@ -56,3 +65,4 @@ Currently only tested on Linux (Fedora Workstation 38)
 ## TODO
 
 - change file viewed on file change
+- exit viewer if file left/buffer changed, or make it configurable
