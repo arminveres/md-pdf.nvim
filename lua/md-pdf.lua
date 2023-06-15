@@ -7,7 +7,7 @@ local utils = require("md-pdf.utils")
 local M = {}
 local results = {}
 local default_config = {
-    margins = "1cm",
+    margins = "1.5cm",
     --- tango, pygments are quite nice for white on white
     highlight = "tango",
     --- Generate a table of contents, on by default
@@ -119,5 +119,14 @@ function M.convert_md_to_pdf()
     uv.read_start(stdout, onread)
     uv.read_start(stderr, onread)
 end
+
+vim.api.nvim_create_autocmd("BufWritePost", {
+    group = vim.api.nvim_create_augroup("md-pdf", { clear = true }),
+    pattern = "*.md",
+    callback = function()
+        if not viewer_open then return end
+        M.convert_md_to_pdf()
+    end
+})
 
 return M
