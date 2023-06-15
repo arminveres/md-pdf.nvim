@@ -32,7 +32,7 @@ Currently you can just put it into `lazy` or `packer` and require it at some poi
 require('md-pdf').setup() -- default options, or
 require('md-pdf').setup({
   --- Set margins around document
-  margins = "1cm",
+  margins = "1.5cm",
   --- tango, pygments are quite nice for white on white
   highlight = "tango",
   --- Generate a table of contents, on by default
@@ -55,5 +55,4 @@ Currently only tested on Linux (Fedora Workstation 38)
 
 ## TODO
 
-- Platform support
-  - [ ] Windows, see #1
+- change file viewed on file change
