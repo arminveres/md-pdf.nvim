@@ -16,6 +16,7 @@ local default_config = {
 
 local viewer_open = false
 
+-- TODO: could move this into setup, so it only gets called once
 local function get_preview_command()
     local os_used = uv.os_uname().sysname
     if os_used == 'Linux' then return 'xdg-open' end
@@ -23,7 +24,6 @@ local function get_preview_command()
     -- assume the other OS is windows for now
     return 'powershell.exe'
 end
-
 
 function M.setup(config)
     if config == nil then
@@ -41,12 +41,14 @@ function M.convert_md_to_pdf()
         utils.log_error("Incorrect filetype " .. vim.bo.filetype .. " not supported!")
         return
     end
+
     --- name of current file
-    local shortname = vim.fn.expand("%:t:r")
+    -- local shortname = vim.fn.expand("%:t:r")
     --- Absolute path of current file
     local fullname = vim.api.nvim_buf_get_name(0)
     --- pdf path name
     local pdf_output_path = string.sub(fullname, 1, -3) .. "pdf"
+
     -- local stdin = uv.new_pipe()
     local stdout = uv.new_pipe()
     local stderr = uv.new_pipe()

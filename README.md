@@ -62,6 +62,15 @@ Currently only tested on Linux (Fedora Workstation 38)
 - [`pandoc`](https://pandoc.org/installing.html) for conversion, also probably some TeX distribution
   with `pdflatex` included.
 
+## Why
+
+I have often found myself wanting to see my markdown files as a PDF, for which I usually created a
+`Makefile` which converted the files through `pandoc`.
+
+After having done it a few times it became repetitive and I thought to myself, why not just create a
+plugin that does exactly that in my favorite text editor.
+And tada, here it is! Enjoy :D
+
 ## TODO
 
 - change file viewed on file change
