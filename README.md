@@ -56,8 +56,10 @@ end)
 
 ## Requirements
 
-Currently only tested on Linux (Fedora Workstation 38)
+Tested on Windows 10, MacOS 13, and Linux (Fedora Workstation 38)
+> **Warning**: the plugin currently only recognizes the document being open on Zathura.
 
+- neovim >= 9, didn't test below that.
 - PDF Viewer, uses `xdg-open` on Linux, `open` on Mac and `powershell` on Windows
 - [`pandoc`](https://pandoc.org/installing.html) for conversion, also probably some TeX distribution
   with `pdflatex` included.
