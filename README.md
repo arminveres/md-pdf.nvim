@@ -25,13 +25,16 @@ Currently you can just put it into `lazy` or `packer` and require it at some poi
     'arminveres/md-pdf',
     branch = 'main', -- you can assume that main is somewhat stable until releases will be made
     lazy = true,
-    keys = { { '<leader>,' } },
-    config = function()
-        require('md-pdf').setup() -- default options, or see down below for further options
-        vim.keymap.set("n", "<leader>,", require('md-pdf').convert_md_to_pdf,
-            { desc = "Markdown preview" }
-        )
-    end
+    keys = {
+        {
+            "<leader>,",
+            function()
+                require("md-pdf").convert_md_to_pdf()
+            end,
+            desc = "Markdown preview",
+        },
+    },
+    opts = {},
 }
 ```
 
@@ -57,6 +60,7 @@ end)
 ## Requirements
 
 Tested on Windows 10, MacOS 13, and Linux (Fedora Workstation 38)
+
 > **Warning**: the plugin currently only recognizes the document being open on Zathura.
 
 - neovim >= 9, didn't test below that.

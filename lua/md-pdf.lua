@@ -21,6 +21,7 @@ local function get_preview_command()
     local os_used = uv.os_uname().sysname
     if os_used == 'Linux' then return 'xdg-open' end
     if os_used == 'Darwin' then return 'open' end
+    -- TODO: (aver) Add BSD check
     -- assume the other OS is windows for now
     return 'powershell.exe'
 end
