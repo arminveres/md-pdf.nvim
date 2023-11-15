@@ -22,7 +22,7 @@ Currently you can just put it into `lazy` or `packer` and require it at some poi
 
 ```lua
 {
-    'arminveres/md-pdf',
+    'arminveres/md-pdf.nvim',
     branch = 'main', -- you can assume that main is somewhat stable until releases will be made
     lazy = true,
     keys = {
