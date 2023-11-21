@@ -1,7 +1,11 @@
 # Markdown to PDF
 
-> **Warning**: This plugin is still very early in its development, so expect bugs and if possible
-> report them here! Thanks and enjoy.
+> [!NOTE]
+> Pull requests are welcome!
+
+> [!WARNING]
+> This plugin is still very early in its development, so expect bugs and if possible report them here!
+> Thanks and enjoy.
 
 A very simple and easy plugin to convert open markdown files to PDFs and open them it to the side.
 
@@ -59,9 +63,10 @@ end)
 
 ## Requirements
 
-Tested on Windows 10, MacOS 13, and Linux (Fedora Workstation 38)
-
-> **Warning**: the plugin currently only recognizes the document being open on Zathura.
+> [!WARNING]
+> The plugin currently only recognizes the document being open on Zathura.
+>
+> Tested on Windows 10, MacOS 13, and Linux (Fedora Workstation 38)
 
 - neovim >= 9, didn't test below that.
 - PDF Viewer, uses `xdg-open` on Linux, `open` on Mac and `powershell` on Windows
