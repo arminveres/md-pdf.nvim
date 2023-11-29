@@ -10,17 +10,17 @@ local results = {}
 
 local viewer_open = false
 
--- TODO: could move this into setup, so it only gets called once
-local function get_preview_command()
-	local os_used = uv.os_uname().sysname
-	if os_used == 'Linux' then return 'xdg-open' end
-	if os_used == 'Darwin' then return 'open' end
-	-- assume the other OS is windows for now
-	return 'powershell.exe'
-end
 
 function M.setup(options)
 	config.setup(options)
+end
+
+local function get_preview_command()
+	local preview_cmd = config.options.preview_cmd
+	if type(preview_cmd) == "function" then
+		return preview_cmd()
+	end
+	return preview_cmd
 end
 
 function M.convert_md_to_pdf()
@@ -71,7 +71,7 @@ function M.convert_md_to_pdf()
 		end
 		zathura_handle = uv.spawn(get_preview_command(), {
 			args = { pdf_output_path },
-		}, function(code, signal) -- on exit
+		}, function(_, _) -- on exit
 			viewer_open = false
 			zathura_handle:close()
 			utils.log_info("Document viewer closed!")
@@ -95,10 +95,14 @@ function M.convert_md_to_pdf()
 	pandoc_handle = uv.spawn("pandoc", {
 		args = pandoc_args,
 		stdio = { nil, stdout, stderr },
-	}, function(code, signal) -- on exit
+	}, function(_, _) -- on exit
+		---@diagnostic disable-next-line: need-check-nil
 		stdout:read_stop()
+		---@diagnostic disable-next-line: need-check-nil
 		stderr:read_stop()
+		---@diagnostic disable-next-line: need-check-nil
 		stdout:close()
+		---@diagnostic disable-next-line: need-check-nil
 		stderr:close()
 		pandoc_handle:close()
 		print_out()
@@ -108,7 +112,9 @@ function M.convert_md_to_pdf()
 
 	utils.log_info("process opened " .. tostring(pandoc_handle))
 
+	---@diagnostic disable-next-line: param-type-mismatch
 	uv.read_start(stdout, onread)
+	---@diagnostic disable-next-line: param-type-mismatch
 	uv.read_start(stderr, onread)
 end
 
