@@ -1,3 +1,4 @@
 {
-  "diagnostics.globals": ["vim", "zathura_handle", "pandoc_handle"]
+  "diagnostics.globals": ["vim", "zathura_handle", "pandoc_handle"],
+    "workspace.checkThirdParty": false
 }
