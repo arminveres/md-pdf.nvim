@@ -13,8 +13,8 @@ A very simple and easy plugin to convert open markdown files to PDFs and open th
 
 ## Features
 
-- Preview markdown documents easily on Linux, Mac and Windows
-- Generate PDF out of markdown
+- Preview markdown documents easily on Linux, Mac, Windows or just define a custom preview command!
+- Generate PDFs out of markdown
 - Lightweight ~200 loc fully lua written plugin
 - auto-generate on save, don't reopen new viewer
 
@@ -53,6 +53,8 @@ require('md-pdf').setup({
   highlight = "tango",
   --- Generate a table of contents, on by default
   toc = true,
+  --- Define a custom preview command, enabling hooks and other custom logic
+  preview_cmd = function() return 'firefox' end
 })
 
 -- setup mapping
