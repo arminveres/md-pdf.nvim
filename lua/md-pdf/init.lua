@@ -104,7 +104,7 @@ function M.convert_md_to_pdf()
         ---@diagnostic disable-next-line: need-check-nil
         stderr:close()
         pandoc_handle:close()
-        print_out()
+        -- print_out()
         open_doc()
         utils.log_info("DOCUMENT CONVERSION COMPLETE")
     end)
