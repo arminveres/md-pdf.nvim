@@ -14,14 +14,14 @@ function M.log_error(str)
     if type(str) ~= "string" then
         str = tostring(str)
     end
-    vim.notify("md-pdf: " .. str, vim.log.levels.ERROR)
+    pcall(vim.notify,"md-pdf: " .. str, vim.log.levels.ERROR)
 end
 
 function M.log_info(str)
     if type(str) ~= "string" then
         str = tostring(str)
     end
-    vim.notify("md-pdf: " .. str)
+    pcall(vim.notify,"md-pdf: " .. str)
 end
 
 return M
