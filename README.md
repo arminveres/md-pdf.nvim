@@ -47,14 +47,14 @@ Currently you can just put it into `lazy` or `packer` and require it at some poi
 ```lua
 require('md-pdf').setup() -- default options, or
 require('md-pdf').setup({
-  --- Set margins around document
-  margins = "1.5cm",
-  --- tango, pygments are quite nice for white on white
-  highlight = "tango",
-  --- Generate a table of contents, on by default
-  toc = true,
-  --- Define a custom preview command, enabling hooks and other custom logic
-  preview_cmd = function() return 'firefox' end
+    --- Set margins around document
+    margins = "1.5cm",
+    --- tango, pygments are quite nice for white on white
+    highlight = "tango",
+    --- Generate a table of contents, on by default
+    toc = true,
+    --- Define a custom preview command, enabling hooks and other custom logic
+    preview_cmd = function() return 'firefox' end
 })
 
 -- setup mapping
