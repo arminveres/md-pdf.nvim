@@ -6,6 +6,7 @@ local config = require("md-pdf.config")
 
 local M = {}
 local viewer_open = false
+local conv_started = false
 local pdf_output_path = ""
 
 function M.setup(options)
@@ -35,10 +36,13 @@ local function open_doc()
 
     vim.system({ get_preview_command(), pdf_output_path }, { text = true }, function()
         viewer_open = false
-        utils.log_info("Document viewer closed!")
+        if not config.options.ignore_viewer_state then
+            utils.log_info("Document viewer closed!")
+        end
     end)
 end
 
+--- Converts markdown file to pdf. If called a second time, the automatic conversion is stopped
 function M.convert_md_to_pdf()
     if vim.bo.filetype ~= "markdown" then
         utils.log_error("Filetype " .. vim.bo.filetype .. " not supported!")
@@ -65,6 +69,7 @@ function M.convert_md_to_pdf()
         table.insert(pandoc_args, "--toc")
     end
 
+    utils.log_info("Markdown to PDF conversion started...")
     vim.system(pandoc_args, { text = true }, function(obj)
         -- Early exit in case of error
         if obj.stderr ~= "" then
@@ -74,8 +79,9 @@ function M.convert_md_to_pdf()
         if obj.stdout ~= "" then
             utils.log_info(obj.stdout)
         end
-        open_doc()
         utils.log_info("Document conversion completed")
+        open_doc()
+        conv_started = true
     end)
 end
 
@@ -85,7 +91,13 @@ vim.api.nvim_create_autocmd("BufWritePost", {
     group = mdaugroup,
     pattern = "*.md",
     callback = function()
-        if not viewer_open then
+        -- Skip auto conversion if we are considering the viewer state, which can be annoying
+        -- with applications such as firefox.
+        if not config.options.ignore_viewer_state and not viewer_open then
+            return
+        end
+        -- Also skip auto conversion, if we have not yet initiated such conversion.
+        if not conv_started then
             return
         end
         M.convert_md_to_pdf()
