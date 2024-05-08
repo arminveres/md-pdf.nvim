@@ -23,6 +23,9 @@ local defaults = {
     --- The command to open the pdf with
     --- @type string | function
     preview_cmd = M.default_preview_cmd,
+    --- if true, then the markdown file is continuously converted on each write, even if the
+    --- file viewer closed, e.g., firefox is "closed" once the document is opened in it.
+    ignore_viewer_state = false,
 }
 
 M.options = {}

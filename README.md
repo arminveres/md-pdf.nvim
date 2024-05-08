@@ -1,4 +1,5 @@
 # Markdown to PDF
+hi
 
 > [!NOTE]
 > Pull requests are welcome!
@@ -32,9 +33,7 @@ Currently you can just put it into `lazy` or `packer` and require it at some poi
     keys = {
         {
             "<leader>,",
-            function()
-                require("md-pdf").convert_md_to_pdf()
-            end,
+            function() require("md-pdf").convert_md_to_pdf() end,
             desc = "Markdown preview",
         },
     },
@@ -55,6 +54,9 @@ require('md-pdf').setup({
     toc = true,
     --- Define a custom preview command, enabling hooks and other custom logic
     preview_cmd = function() return 'firefox' end
+    --- if true, then the markdown file is continuously converted on each write, even if the
+    --- file viewer closed, e.g., firefox is "closed" once the document is opened in it.
+    ignore_viewer_state = false,
 })
 
 -- setup mapping
@@ -86,5 +88,4 @@ And tada, here it is! Enjoy :D
 
 ## TODO
 
-- change file viewed on file change
 - exit viewer if file left/buffer changed, or make it configurable
