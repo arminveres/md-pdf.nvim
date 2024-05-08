@@ -1,5 +1,4 @@
 # Markdown to PDF
-hi
 
 > [!NOTE]
 > Pull requests are welcome!
