@@ -69,6 +69,27 @@ function M.convert_md_to_pdf()
         table.insert(pandoc_args, "--toc")
     end
 
+    if config.options.fonts then
+        table.insert(pandoc_args, "--pdf-engine=lualatex")
+        local ftable = config.options.fonts
+        if ftable.main_font then
+            table.insert(pandoc_args, "-V")
+            table.insert(pandoc_args, "mainfont:" .. ftable.main_font)
+        end
+        if ftable.sans_font then
+            table.insert(pandoc_args, "-V")
+            table.insert(pandoc_args, "sansfont:" .. ftable.sans_font)
+        end
+        if ftable.mono_font then
+            table.insert(pandoc_args, "-V")
+            table.insert(pandoc_args, "monofont:" .. ftable.mono_font)
+        end
+        if ftable.math_font then
+            table.insert(pandoc_args, "-V")
+            table.insert(pandoc_args, "mathfont:" .. ftable.math_font)
+        end
+    end
+
     utils.log_info("Markdown to PDF conversion started...")
     vim.system(pandoc_args, { text = true }, function(obj)
         -- Early exit in case of error

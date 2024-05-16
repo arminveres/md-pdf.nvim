@@ -16,7 +16,7 @@ end
 
 local defaults = {
     margins = "1.5cm",
-    --- tango, pygments are quite nice for white on white
+    --- Theme for the pdf document. `tango`, pygments are quite nice for white on white
     highlight = "tango",
     --- Generate a table of contents, on by default
     toc = true,
@@ -26,6 +26,8 @@ local defaults = {
     --- if true, then the markdown file is continuously converted on each write, even if the
     --- file viewer closed, e.g., firefox is "closed" once the document is opened in it.
     ignore_viewer_state = false,
+    --- Specify font, `nil` uses the default font of the theme
+    fonts = nil,
 }
 
 M.options = {}
