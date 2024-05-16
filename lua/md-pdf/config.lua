@@ -28,6 +28,8 @@ local defaults = {
     ignore_viewer_state = false,
     --- Specify font, `nil` uses the default font of the theme
     fonts = nil,
+    --- Custom options passed to `pandoc` CLI call
+    pandoc_user_args = nil,
 }
 
 M.options = {}

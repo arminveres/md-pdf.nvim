@@ -66,6 +66,15 @@ require('md-pdf').setup({
         mono_font = "IosevkaTerm Nerd Font Mono",
         math_font = nil,
     },
+    -- Custom options passed to `pandoc` CLI call, can be ignored for setup
+    pandoc_user_args = nil,
+    -- or
+    pandoc_user_args = {
+        -- short
+        "-V KEY[:VALUE]",
+        -- long options
+        "--standalone=[true|false]",
+    },
 })
 
 -- setup mapping

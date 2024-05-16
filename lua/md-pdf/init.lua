@@ -90,6 +90,14 @@ function M.convert_md_to_pdf()
         end
     end
 
+    if config.options.pandoc_user_args then
+        for _, value in ipairs(config.options.pandoc_user_args) do
+            for token in string.gmatch(value, "[^%s]+") do
+                table.insert(pandoc_args, token)
+            end
+        end
+    end
+
     utils.log_info("Markdown to PDF conversion started...")
     vim.system(pandoc_args, { text = true }, function(obj)
         -- Early exit in case of error
