@@ -59,14 +59,41 @@ function M.convert_md_to_pdf()
         "-V",
         "geometry:margin=" .. config.options.margins,
         fullname,
-        "-o",
-        pdf_output_path,
-        "--highlight",
-        config.options.highlight,
+        "--output=" .. pdf_output_path,
+        "--highlight-style=" .. config.options.highlight,
     }
 
     if config.options.toc then
         table.insert(pandoc_args, "--toc")
+    end
+
+    if config.options.fonts then
+        table.insert(pandoc_args, "--pdf-engine=lualatex")
+        local ftable = config.options.fonts
+        if ftable.main_font then
+            table.insert(pandoc_args, "-V")
+            table.insert(pandoc_args, "mainfont:" .. ftable.main_font)
+        end
+        if ftable.sans_font then
+            table.insert(pandoc_args, "-V")
+            table.insert(pandoc_args, "sansfont:" .. ftable.sans_font)
+        end
+        if ftable.mono_font then
+            table.insert(pandoc_args, "-V")
+            table.insert(pandoc_args, "monofont:" .. ftable.mono_font)
+        end
+        if ftable.math_font then
+            table.insert(pandoc_args, "-V")
+            table.insert(pandoc_args, "mathfont:" .. ftable.math_font)
+        end
+    end
+
+    if config.options.pandoc_user_args then
+        for _, value in ipairs(config.options.pandoc_user_args) do
+            for token in string.gmatch(value, "[^%s]+") do
+                table.insert(pandoc_args, token)
+            end
+        end
     end
 
     utils.log_info("Markdown to PDF conversion started...")
