@@ -59,10 +59,8 @@ function M.convert_md_to_pdf()
         "-V",
         "geometry:margin=" .. config.options.margins,
         fullname,
-        "-o",
-        pdf_output_path,
-        "--highlight",
-        config.options.highlight,
+        "--output=" .. pdf_output_path,
+        "--highlight-style=" .. config.options.highlight,
     }
 
     if config.options.toc then
