@@ -1,3 +1,5 @@
+---@diagnostic disable: undefined-field, need-check-nil
+
 -- Found this helpful site for vim.loop handling
 --  https://teukka.tech/vimloop.html
 
@@ -14,6 +16,7 @@ function M.setup(options)
 end
 
 --- Returns the preview command, which can be either a string or a function.
+--- @return string
 local function get_preview_command()
     local preview_cmd = config.options.preview_cmd
     if type(preview_cmd) == "function" then
@@ -22,7 +25,7 @@ local function get_preview_command()
         return preview_cmd
     else
         utils.log_error("Unknown preview command specified, return defaults")
-        return config.default_preview_cmd
+        return config.default_preview_cmd()
     end
 end
 

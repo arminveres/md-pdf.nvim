@@ -1,17 +1,18 @@
-local uv = vim.loop
-
 local M = {}
 
+---@return string
 M.default_preview_cmd = function()
-    local os_used = uv.os_uname().sysname
+    local os_used = vim.uv.os_uname().sysname
     if os_used == "Linux" then
         return "xdg-open"
     end
     if os_used == "Darwin" then
         return "open"
     end
-    -- assume the other OS is windows for now
-    return "powershell.exe"
+    if os_used == "Windows_NT" then
+        return "powershell.exe"
+    end
+    require("md-pdf.utils").log_error("Unkown System: " .. os_used)
 end
 
 local defaults = {
@@ -21,7 +22,6 @@ local defaults = {
     --- Generate a table of contents, on by default
     toc = true,
     --- The command to open the pdf with
-    --- @type string | function
     preview_cmd = M.default_preview_cmd,
     --- if true, then the markdown file is continuously converted on each write, even if the
     --- file viewer closed, e.g., firefox is "closed" once the document is opened in it.
