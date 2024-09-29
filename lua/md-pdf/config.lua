@@ -30,6 +30,9 @@ local defaults = {
     fonts = nil,
     --- Custom options passed to `pandoc` CLI call
     pandoc_user_args = nil,
+    --- Path to output. Needs to be always relative, e.g.: "./", "../", "./out" or simply "out", but
+    --- not absolute e.g.: "/"!
+    output_path = "",
 }
 
 M.options = {}
