@@ -75,6 +75,9 @@ require('md-pdf').setup({
         -- long options
         "--standalone=[true|false]",
     },
+    --- Path to output. Needs to be always relative, e.g.: "./", "../", "./out" or simply "out", but
+    --- not absolute e.g.: "/"!
+    output_path = "",
 })
 
 -- setup mapping
@@ -103,7 +106,3 @@ I have often found myself wanting to see my markdown files as a PDF, for which I
 After having done it a few times it became repetitive and I thought to myself, why not just create a
 plugin that does exactly that in my favorite text editor.
 And tada, here it is! Enjoy :D
-
-## TODO
-
-- exit viewer if file left/buffer changed, or make it configurable
