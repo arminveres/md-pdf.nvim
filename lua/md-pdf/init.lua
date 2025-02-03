@@ -85,12 +85,15 @@ function M.convert_md_to_pdf()
         "--highlight-style=" .. config.options.highlight,
     }
 
+    if config.options.pdf_engine then
+        table.insert(pandoc_args, "--pdf-engine=" .. config.options.pdf_engine)
+    end
+
     if config.options.toc then
         table.insert(pandoc_args, "--toc")
     end
 
     if config.options.fonts then
-        table.insert(pandoc_args, "--pdf-engine=lualatex")
         local ftable = config.options.fonts
         if ftable.main_font then
             table.insert(pandoc_args, "-V")

@@ -36,6 +36,8 @@ local defaults = {
     ---@type string Path to output. Needs to be always relative, e.g.: "./", "../", "./out" or
     ---simply "out", but not absolute e.g.: "/"!
     output_path = "",
+    ---@type string PDF converter engine
+    pdf_engine = "pdflatex",
 }
 
 ---@class md-pdf.config
