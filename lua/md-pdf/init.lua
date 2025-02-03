@@ -121,6 +121,18 @@ function M.convert_md_to_pdf()
         end
     end
 
+    -- Add courtesy warning in case of non-specified pdf engine
+    if config.options.fonts then
+        for _, value in ipairs(pandoc_args) do
+            if string.gmatch(value, "[pdflatex]") then
+                log.warn(
+                    "When specifying custom fonts, you may encounter utf-8 error. Consider switching to another engine, e.g., lualatex"
+                )
+                break
+            end
+        end
+    end
+
     log.info("Markdown to PDF conversion started...")
     vim.system(pandoc_args, { text = true }, function(obj)
         -- Early exit in case of error
