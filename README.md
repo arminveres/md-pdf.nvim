@@ -36,6 +36,7 @@ Currently you can just put it into `lazy` or `packer` and require it at some poi
             desc = "Markdown preview",
         },
     },
+    ---@type md-pdf.config
     opts = {},
 }
 ```
@@ -54,7 +55,7 @@ require('md-pdf').setup({
     -- Define a custom preview command, enabling hooks and other custom logic
     preview_cmd = function() return 'firefox' end,
     -- if true, then the markdown file is continuously converted on each write, even if the
-    -- file viewer closed, e.g., firefox is "closed" once the document is opened in it.
+    -- file viewer closed, e.g., Firefox is "closed" once the document is opened in it.
     ignore_viewer_state = false,
     -- Specify font, `nil` uses the default font of the theme
     fonts = nil,
@@ -78,6 +79,8 @@ require('md-pdf').setup({
     --- Path to output. Needs to be always relative, e.g.: "./", "../", "./out" or simply "out", but
     --- not absolute e.g.: "/"!
     output_path = "",
+    -- PDF converter engine
+    pdf_engine = "pdflatex",
 })
 
 -- setup mapping
@@ -105,4 +108,4 @@ I have often found myself wanting to see my markdown files as a PDF, for which I
 
 After having done it a few times it became repetitive and I thought to myself, why not just create a
 plugin that does exactly that in my favorite text editor.
-And tada, here it is! Enjoy :D
+And voila, here it is! Enjoy :D
