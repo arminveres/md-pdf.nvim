@@ -3,20 +3,21 @@
 -- Found this helpful site for vim.loop handling
 --  https://teukka.tech/vimloop.html
 
-local utils = require("md-pdf.utils")
 local config = require("md-pdf.config")
+local utils = require("md-pdf.utils")
+local log = utils.log
 
 local M = {}
 local viewer_open = false
 local conv_started = false
 local pdf_output_path = ""
 
+---@param options md-pdf.config
 function M.setup(options)
     config.setup(options)
 end
 
---- Returns the preview command, which can be either a string or a function.
---- @return string
+--- @return string: preview command, which can be either a string or a function.
 local function get_preview_command()
     local preview_cmd = config.options.preview_cmd
     if type(preview_cmd) == "function" then
@@ -24,7 +25,7 @@ local function get_preview_command()
     elseif type(preview_cmd) == "string" then
         return preview_cmd
     else
-        utils.log_error("Unknown preview command specified, return defaults")
+        log.error("Unknown preview command specified, return defaults")
         return config.default_preview_cmd()
     end
 end
@@ -40,7 +41,7 @@ local function open_doc()
     vim.system({ get_preview_command(), pdf_output_path }, { text = true }, function()
         viewer_open = false
         if not config.options.ignore_viewer_state then
-            utils.log_info("Document viewer closed!")
+            log.info("Document viewer closed!")
         end
     end)
 end
@@ -48,7 +49,7 @@ end
 --- Converts markdown file to pdf. If called a second time, the automatic conversion is stopped
 function M.convert_md_to_pdf()
     if vim.bo.filetype ~= "markdown" then
-        utils.log_error("Filetype " .. vim.bo.filetype .. " not supported!")
+        log.error("Filetype " .. vim.bo.filetype .. " not supported!")
         return
     end
 
@@ -67,7 +68,7 @@ function M.convert_md_to_pdf()
     path_parts = vim.list_extend(path_parts, config_paths)
 
     -- create dir if necessary
-    vim.fn.mkdir(table.concat(path_parts, "/"),"p")
+    vim.fn.mkdir(table.concat(path_parts, "/"), "p")
 
     -- add updated filename
     path_parts[#path_parts + 1] = updated_file_name
@@ -84,12 +85,15 @@ function M.convert_md_to_pdf()
         "--highlight-style=" .. config.options.highlight,
     }
 
+    if config.options.pdf_engine then
+        table.insert(pandoc_args, "--pdf-engine=" .. config.options.pdf_engine)
+    end
+
     if config.options.toc then
         table.insert(pandoc_args, "--toc")
     end
 
     if config.options.fonts then
-        table.insert(pandoc_args, "--pdf-engine=lualatex")
         local ftable = config.options.fonts
         if ftable.main_font then
             table.insert(pandoc_args, "-V")
@@ -117,17 +121,29 @@ function M.convert_md_to_pdf()
         end
     end
 
-    utils.log_info("Markdown to PDF conversion started...")
+    -- Add courtesy warning in case of non-specified pdf engine
+    if config.options.fonts then
+        for _, value in ipairs(pandoc_args) do
+            if string.gmatch(value, "[pdflatex]") then
+                log.warn(
+                    "When specifying custom fonts, you may encounter utf-8 error. Consider switching to another engine, e.g., lualatex"
+                )
+                break
+            end
+        end
+    end
+
+    log.info("Markdown to PDF conversion started...")
     vim.system(pandoc_args, { text = true }, function(obj)
         -- Early exit in case of error
         if obj.stderr ~= "" then
-            utils.log_error(obj.stderr)
+            log.error(obj.stderr)
             return
         end
         if obj.stdout ~= "" then
-            utils.log_info(obj.stdout)
+            log.info(obj.stdout)
         end
-        utils.log_info("Document conversion completed")
+        log.info("Document conversion completed")
         open_doc()
         conv_started = true
     end)

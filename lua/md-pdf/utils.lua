@@ -10,18 +10,30 @@ function M.has_value(tab, val)
     return false
 end
 
-function M.log_error(str)
+M.log = {}
+
+---@param str string Log Message
+function M.log.info(str)
     if type(str) ~= "string" then
         str = tostring(str)
     end
-    pcall(vim.notify,"md-pdf: " .. str, vim.log.levels.ERROR)
+    pcall(vim.notify, "md-pdf: " .. str)
 end
 
-function M.log_info(str)
+---@param str string Log Message
+function M.log.warn(str)
     if type(str) ~= "string" then
         str = tostring(str)
     end
-    pcall(vim.notify,"md-pdf: " .. str)
+    pcall(vim.notify, "md-pdf: " .. str, vim.log.levels.WARN)
+end
+
+---@param str string Log Message
+function M.log.error(str)
+    if type(str) ~= "string" then
+        str = tostring(str)
+    end
+    pcall(vim.notify, "md-pdf: " .. str, vim.log.levels.ERROR)
 end
 
 return M
