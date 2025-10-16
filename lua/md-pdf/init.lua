@@ -55,6 +55,8 @@ function M.convert_md_to_pdf()
 
     -- Get the absolute path of current file
     local fullname = vim.api.nvim_buf_get_name(0)
+    -- get the directory for resources
+    local file_dir = vim.fn.fnamemodify(fullname, ":h")
     -- split on slashes because of absolute
     local path_parts = vim.split(fullname, "/")
     -- get file name and change filetype
@@ -83,6 +85,7 @@ function M.convert_md_to_pdf()
         fullname,
         "--output=" .. pdf_output_path,
         "--highlight-style=" .. config.options.highlight,
+        "--resource-path=" .. file_dir,
     }
 
     if config.options.pdf_engine then
