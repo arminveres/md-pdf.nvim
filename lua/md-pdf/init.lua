@@ -55,28 +55,16 @@ function M.convert_md_to_pdf()
 
     -- Get the absolute path of current file
     local fullname = vim.api.nvim_buf_get_name(0)
-    -- get the directory for resources
     local file_dir = vim.fn.fnamemodify(fullname, ":h")
-    -- split on slashes because of absolute
-    local path_parts = vim.split(fullname, "/")
-    -- get file name and change filetype
-    local file_name = path_parts[#path_parts]
-    local updated_file_name = string.sub(file_name, 1, -3) .. "pdf"
-    -- remove file from table
-    path_parts[#path_parts] = nil
-
-    -- repeat with user specified path
-    local config_paths = vim.split(config.options.output_path, "/")
-    path_parts = vim.list_extend(path_parts, config_paths)
+    local file_name_without_ext = vim.fn.fnamemodify(fullname, ":t:r")
+    local updated_file_name = file_name_without_ext .. ".pdf"
 
     -- create dir if necessary
-    vim.fn.mkdir(table.concat(path_parts, "/"), "p")
-
-    -- add updated filename
-    path_parts[#path_parts + 1] = updated_file_name
+    local output_dir = file_dir .. "/" .. config.options.output_path
+    vim.fn.mkdir(output_dir, "p")
 
     -- get a single string as a path
-    pdf_output_path = table.concat(path_parts, "/")
+    pdf_output_path = output_dir .. "/" .. updated_file_name
 
     local pandoc_args = {
         "pandoc",
