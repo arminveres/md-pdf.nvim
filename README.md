@@ -52,6 +52,8 @@ require('md-pdf').setup({
     highlight = "tango",
     -- Generate a table of contents, on by default
     toc = true,
+    -- Render a dedicated title page (and keep ToC on a separate page)
+    title_page = false,
     -- Define a custom preview command, enabling hooks and other custom logic
     preview_cmd = function() return 'firefox' end,
     -- if true, then the markdown file is continuously converted on each write, even if the

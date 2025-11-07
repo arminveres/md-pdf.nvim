@@ -76,6 +76,29 @@ function M.convert_md_to_pdf()
         "--resource-path=" .. file_dir,
     }
 
+    local header_include
+
+    if config.options.title_page then
+        table.insert(pandoc_args, "-V")
+        table.insert(pandoc_args, "classoption=titlepage")
+
+        if config.options.toc then
+            local toc_header_lines = {
+                "\\usepackage{etoolbox}",
+                "\\pretocmd{\\tableofcontents}{\\clearpage}{}{}",
+                "\\apptocmd{\\tableofcontents}{\\clearpage}{}{}",
+            }
+            local toc_header_path = vim.fn.tempname() .. ".tex"
+            local ok, err = pcall(vim.fn.writefile, toc_header_lines, toc_header_path)
+            if ok then
+                header_include = toc_header_path
+                table.insert(pandoc_args, "--include-in-header=" .. toc_header_path)
+            else
+                log.warn("Failed to prepare title page header include: " .. tostring(err))
+            end
+        end
+    end
+
     if config.options.pdf_engine then
         table.insert(pandoc_args, "--pdf-engine=" .. config.options.pdf_engine)
     end
@@ -126,6 +149,9 @@ function M.convert_md_to_pdf()
 
     log.info("Markdown to PDF conversion started...")
     vim.system(pandoc_args, { text = true }, function(obj)
+        if header_include then
+            pcall(vim.loop.fs_unlink, header_include)
+        end
         -- Early exit in case of error
         if obj.stderr ~= "" then
             log.error(obj.stderr)
