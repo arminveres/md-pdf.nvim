@@ -12,6 +12,58 @@ local viewer_open = false
 local conv_started = false
 local pdf_output_path = ""
 
+local function trim_quotes(str)
+    if not str then
+        return nil
+    end
+    str = vim.trim(str)
+    local first = str:sub(1, 1)
+    local last = str:sub(-1)
+    if (first == '"' and last == '"') or (first == "'" and last == "'") then
+        return str:sub(2, -2)
+    end
+    return str
+end
+
+local function resolve_logo_path(fullname, file_dir)
+    local ok, lines = pcall(vim.fn.readfile, fullname)
+    if not ok or #lines == 0 then
+        return nil
+    end
+    if not lines[1]:match("^%-%-%-$") then
+        return nil
+    end
+
+    for i = 2, #lines do
+        local line = lines[i]
+        if line:match("^%-%-%-$") then
+            break
+        end
+        local key, value = line:match("^([%w_%-%:]+)%s*:%s*(.+)$")
+        if key then
+            key = vim.trim(key)
+            if key == "logo" or key == "titlegraphic" then
+                value = trim_quotes(value)
+                if value and value ~= "" then
+                    if value:sub(1, 1) == "~" then
+                        value = vim.fn.expand(value)
+                    elseif not vim.startswith(value, "/") then
+                        value = vim.fs.normalize(file_dir .. "/" .. value)
+                    end
+                    return value
+                end
+            end
+        end
+    end
+end
+
+local function detokenize_path(path)
+    if not path then
+        return nil
+    end
+    return "\\detokenize{" .. path .. "}"
+end
+
 ---@param options md-pdf.config
 function M.setup(options)
     config.setup(options)
@@ -77,22 +129,38 @@ function M.convert_md_to_pdf()
     }
 
     local header_include
+    local header_lines = {}
+    local logo_path = resolve_logo_path(fullname, file_dir)
 
     if config.options.title_page then
         table.insert(pandoc_args, "-V")
         table.insert(pandoc_args, "classoption=titlepage")
 
+        if logo_path then
+            table.insert(header_lines, "\\usepackage{graphicx}")
+            table.insert(header_lines, "\\usepackage{titling}")
+            table.insert(
+                header_lines,
+                string.format(
+                    "\\pretitle{\\begin{center}\\includegraphics[width=0.4\\textwidth]{%s}\\\\[1em]}",
+                    detokenize_path(logo_path)
+                )
+            )
+            table.insert(header_lines, "\\posttitle{\\par\\end{center}}")
+        end
+
         if config.options.toc then
-            local toc_header_lines = {
-                "\\usepackage{etoolbox}",
-                "\\pretocmd{\\tableofcontents}{\\clearpage}{}{}",
-                "\\apptocmd{\\tableofcontents}{\\clearpage}{}{}",
-            }
-            local toc_header_path = vim.fn.tempname() .. ".tex"
-            local ok, err = pcall(vim.fn.writefile, toc_header_lines, toc_header_path)
+            table.insert(header_lines, "\\usepackage{etoolbox}")
+            table.insert(header_lines, "\\pretocmd{\\tableofcontents}{\\clearpage}{}{}")
+            table.insert(header_lines, "\\apptocmd{\\tableofcontents}{\\clearpage}{}{}")
+        end
+
+        if #header_lines > 0 then
+            local include_path = vim.fn.tempname() .. ".tex"
+            local ok, err = pcall(vim.fn.writefile, header_lines, include_path)
             if ok then
-                header_include = toc_header_path
-                table.insert(pandoc_args, "--include-in-header=" .. toc_header_path)
+                header_include = include_path
+                table.insert(pandoc_args, "--include-in-header=" .. include_path)
             else
                 log.warn("Failed to prepare title page header include: " .. tostring(err))
             end

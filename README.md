@@ -91,6 +91,10 @@ vim.keymap.set("n", "<Space>,", function()
 end)
 ```
 
+### Title page metadata
+
+When `title_page = true`, add a standard Pandoc/YAML front matter block to your markdown file. Fields like `title`, `author`, `date`, and an optional `logo` (relative to the markdown file, e.g. `assets/logo.png`) are picked up automatically and rendered on the dedicated title page.
+
 ## Requirements
 
 > [!WARNING]
