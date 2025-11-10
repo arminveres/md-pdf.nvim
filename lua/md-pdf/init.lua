@@ -12,20 +12,25 @@ local viewer_open = false
 local conv_started = false
 local pdf_output_path = ""
 
-local function trim_quotes(str)
-    if not str then
+---@param quoted_text string|nil
+---@return string|nil
+local function trim_quotes(quoted_text)
+    if not quoted_text then
         return nil
     end
-    str = vim.trim(str)
-    local first = str:sub(1, 1)
-    local last = str:sub(-1)
+    quoted_text = vim.trim(quoted_text)
+    local first = quoted_text:sub(1, 1)
+    local last = quoted_text:sub(-1)
     if (first == '"' and last == '"') or (first == "'" and last == "'") then
-        return str:sub(2, -2)
+        return quoted_text:sub(2, -2)
     end
-    return str
+    return quoted_text
 end
 
-local function resolve_logo_path(fullname, file_dir)
+---@param fullname string
+---@param file_dir string
+---@return string|nil
+local function resolve_header_logo_path(fullname, file_dir)
     local ok, lines = pcall(vim.fn.readfile, fullname)
     if not ok or #lines == 0 then
         return nil
@@ -62,6 +67,56 @@ local function detokenize_path(path)
         return nil
     end
     return "\\detokenize{" .. path .. "}"
+end
+
+---@param fullname string
+---@param file_dir string
+---@return string[]
+---@return string|nil
+local function build_title_page_args(fullname, file_dir)
+    if not config.options.title_page then
+        return {}, nil
+    end
+
+    local pandoc_flags = {
+        "-V",
+        "classoption=titlepage",
+    }
+    local header_lines = {}
+    local header_include
+    local logo_path = resolve_header_logo_path(fullname, file_dir)
+
+    if logo_path then
+        table.insert(header_lines, [[\usepackage{graphicx}]])
+        table.insert(header_lines, [[\usepackage{titling}]])
+        table.insert(
+            header_lines,
+            string.format(
+                [[\pretitle{\begin{center}\includegraphics[width=0.4\textwidth]{%s}\\[1em]}]],
+                detokenize_path(logo_path)
+            )
+        )
+        table.insert(header_lines, [[\posttitle{\par\end{center}}]])
+    end
+
+    if config.options.toc then
+        table.insert(header_lines, [[\usepackage{etoolbox}]])
+        table.insert(header_lines, [[\pretocmd{\tableofcontents}{\clearpage}{}{}]])
+        table.insert(header_lines, [[\apptocmd{\tableofcontents}{\clearpage}{}{}]])
+    end
+
+    if #header_lines > 0 then
+        local include_path = vim.fn.tempname() .. ".tex"
+        local ok, err = pcall(vim.fn.writefile, header_lines, include_path)
+        if ok then
+            header_include = include_path
+            table.insert(pandoc_flags, "--include-in-header=" .. include_path)
+        else
+            log.warn("Failed to prepare title page header include: " .. tostring(err))
+        end
+    end
+
+    return pandoc_flags, header_include
 end
 
 ---@param options md-pdf.config
@@ -129,42 +184,10 @@ function M.convert_md_to_pdf()
     }
 
     local header_include
-    local header_lines = {}
-    local logo_path = resolve_logo_path(fullname, file_dir)
-
     if config.options.title_page then
-        table.insert(pandoc_args, "-V")
-        table.insert(pandoc_args, "classoption=titlepage")
-
-        if logo_path then
-            table.insert(header_lines, "\\usepackage{graphicx}")
-            table.insert(header_lines, "\\usepackage{titling}")
-            table.insert(
-                header_lines,
-                string.format(
-                    "\\pretitle{\\begin{center}\\includegraphics[width=0.4\\textwidth]{%s}\\\\[1em]}",
-                    detokenize_path(logo_path)
-                )
-            )
-            table.insert(header_lines, "\\posttitle{\\par\\end{center}}")
-        end
-
-        if config.options.toc then
-            table.insert(header_lines, "\\usepackage{etoolbox}")
-            table.insert(header_lines, "\\pretocmd{\\tableofcontents}{\\clearpage}{}{}")
-            table.insert(header_lines, "\\apptocmd{\\tableofcontents}{\\clearpage}{}{}")
-        end
-
-        if #header_lines > 0 then
-            local include_path = vim.fn.tempname() .. ".tex"
-            local ok, err = pcall(vim.fn.writefile, header_lines, include_path)
-            if ok then
-                header_include = include_path
-                table.insert(pandoc_args, "--include-in-header=" .. include_path)
-            else
-                log.warn("Failed to prepare title page header include: " .. tostring(err))
-            end
-        end
+        local title_page_args
+        title_page_args, header_include = build_title_page_args(fullname, file_dir)
+        vim.list_extend(pandoc_args, title_page_args)
     end
 
     if config.options.pdf_engine then
