@@ -175,6 +175,7 @@ function M.convert_md_to_pdf()
 
     local pandoc_args = {
         "pandoc",
+        "--standalone",
         "-V",
         "geometry:margin=" .. config.options.margins,
         fullname,
