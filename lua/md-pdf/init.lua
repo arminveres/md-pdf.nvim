@@ -12,6 +12,113 @@ local viewer_open = false
 local conv_started = false
 local pdf_output_path = ""
 
+---@param quoted_text string|nil
+---@return string|nil
+local function trim_quotes(quoted_text)
+    if not quoted_text then
+        return nil
+    end
+    quoted_text = vim.trim(quoted_text)
+    local first = quoted_text:sub(1, 1)
+    local last = quoted_text:sub(-1)
+    if (first == '"' and last == '"') or (first == "'" and last == "'") then
+        return quoted_text:sub(2, -2)
+    end
+    return quoted_text
+end
+
+---@param fullname string
+---@param file_dir string
+---@return string|nil
+local function resolve_header_logo_path(fullname, file_dir)
+    local ok, lines = pcall(vim.fn.readfile, fullname)
+    if not ok or #lines == 0 then
+        return nil
+    end
+    if not lines[1]:match("^%-%-%-$") then
+        return nil
+    end
+
+    for i = 2, #lines do
+        local line = lines[i]
+        if line:match("^%-%-%-$") then
+            break
+        end
+        local key, value = line:match("^([%w_%-%:]+)%s*:%s*(.+)$")
+        if key then
+            key = vim.trim(key)
+            if key == "logo" or key == "titlegraphic" then
+                value = trim_quotes(value)
+                if value and value ~= "" then
+                    if value:sub(1, 1) == "~" then
+                        value = vim.fn.expand(value)
+                    elseif not vim.startswith(value, "/") then
+                        value = vim.fs.normalize(file_dir .. "/" .. value)
+                    end
+                    return value
+                end
+            end
+        end
+    end
+end
+
+local function detokenize_path(path)
+    if not path then
+        return nil
+    end
+    return "\\detokenize{" .. path .. "}"
+end
+
+---@param fullname string
+---@param file_dir string
+---@return string[]
+---@return string|nil
+local function build_title_page_args(fullname, file_dir)
+    if not config.options.title_page then
+        return {}, nil
+    end
+
+    local pandoc_flags = {
+        "-V",
+        "classoption=titlepage",
+    }
+    local header_lines = {}
+    local header_include
+    local logo_path = resolve_header_logo_path(fullname, file_dir)
+
+    if logo_path then
+        table.insert(header_lines, [[\usepackage{graphicx}]])
+        table.insert(header_lines, [[\usepackage{titling}]])
+        table.insert(
+            header_lines,
+            string.format(
+                [[\pretitle{\begin{center}\includegraphics[width=0.4\textwidth]{%s}\\[1em]}]],
+                detokenize_path(logo_path)
+            )
+        )
+        table.insert(header_lines, [[\posttitle{\par\end{center}}]])
+    end
+
+    if config.options.toc then
+        table.insert(header_lines, [[\usepackage{etoolbox}]])
+        table.insert(header_lines, [[\pretocmd{\tableofcontents}{\clearpage}{}{}]])
+        table.insert(header_lines, [[\apptocmd{\tableofcontents}{\clearpage}{}{}]])
+    end
+
+    if #header_lines > 0 then
+        local include_path = vim.fn.tempname() .. ".tex"
+        local ok, err = pcall(vim.fn.writefile, header_lines, include_path)
+        if ok then
+            header_include = include_path
+            table.insert(pandoc_flags, "--include-in-header=" .. include_path)
+        else
+            log.warn("Failed to prepare title page header include: " .. tostring(err))
+        end
+    end
+
+    return pandoc_flags, header_include
+end
+
 ---@param options md-pdf.config
 function M.setup(options)
     config.setup(options)
@@ -68,6 +175,7 @@ function M.convert_md_to_pdf()
 
     local pandoc_args = {
         "pandoc",
+        "--standalone",
         "-V",
         "geometry:margin=" .. config.options.margins,
         fullname,
@@ -75,6 +183,13 @@ function M.convert_md_to_pdf()
         "--highlight-style=" .. config.options.highlight,
         "--resource-path=" .. file_dir,
     }
+
+    local header_include
+    if config.options.title_page then
+        local title_page_args
+        title_page_args, header_include = build_title_page_args(fullname, file_dir)
+        vim.list_extend(pandoc_args, title_page_args)
+    end
 
     if config.options.pdf_engine then
         table.insert(pandoc_args, "--pdf-engine=" .. config.options.pdf_engine)
@@ -126,6 +241,9 @@ function M.convert_md_to_pdf()
 
     log.info("Markdown to PDF conversion started...")
     vim.system(pandoc_args, { text = true }, function(obj)
+        if header_include then
+            pcall(vim.loop.fs_unlink, header_include)
+        end
         -- Early exit in case of error
         if obj.stderr ~= "" then
             log.error(obj.stderr)

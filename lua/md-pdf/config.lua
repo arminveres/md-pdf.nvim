@@ -23,6 +23,8 @@ local defaults = {
     highlight = "tango",
     ---@type boolean Generate a table of contents, on by default
     toc = true,
+    ---@type boolean Render a separate title page (followed by an optional TOC page)
+    title_page = false,
     ---@type function The command to open the pdf with
     preview_cmd = M.default_preview_cmd,
     ---@type boolean if true, then the markdown file is continuously converted on each write,
