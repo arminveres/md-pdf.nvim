@@ -180,7 +180,7 @@ function M.convert_md_to_pdf()
         "geometry:margin=" .. config.options.margins,
         fullname,
         "--output=" .. pdf_output_path,
-        "--highlight-style=" .. config.options.highlight,
+        "--syntax-highlighting=" .. config.options.highlight,
         "--resource-path=" .. file_dir,
     }
 
